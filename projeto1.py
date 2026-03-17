@@ -121,6 +121,32 @@ pyramid_base = [
 (-0.0897,0.00,-0.1923)
 ]
 
+floor = [
+
+# TOP FACE (just below the house)
+(-1.0, -0.21, -1.0), ( 1.0, -0.21, -1.0), ( 1.0, -0.21,  1.0),
+(-1.0, -0.21, -1.0), ( 1.0, -0.21,  1.0), (-1.0, -0.21,  1.0),
+
+# BOTTOM FACE
+(-1.0, -1, -1.0), ( 1.0, -1,  1.0), ( 1.0, -1, -1.0),
+(-1.0, -1, -1.0), (-1.0, -1,  1.0), ( 1.0, -1,  1.0),
+
+# FRONT
+(-1.0, -1,  1.0), ( 1.0, -0.21,  1.0), ( 1.0, -1,  1.0),
+(-1.0, -1,  1.0), (-1.0, -0.21,  1.0), ( 1.0, -0.21,  1.0),
+
+# BACK
+(-1.0, -1, -1.0), ( 1.0, -1, -1.0), ( 1.0, -0.21, -1.0),
+(-1.0, -1, -1.0), ( 1.0, -0.21, -1.0), (-1.0, -0.21, -1.0),
+
+# LEFT
+(-1.0, -1, -1.0), (-1.0, -0.21,  1.0), (-1.0, -1,  1.0),
+(-1.0, -1, -1.0), (-1.0, -0.21, -1.0), (-1.0, -0.21,  1.0),
+# RIGHT
+( 1.0, -1, -1.0), ( 1.0, -0.21,  1.0), ( 1.0, -0.21,  1.0),
+( 1.0, -1, -1.0), ( 1.0, -0.21,  1.0), ( 1.0, -0.21, -1.0),
+]
+
 walls = cube + cube_sides
 roof = pyramid + pyramid_sides + pyramid_base
 
@@ -129,6 +155,9 @@ vertices_walls["position"] = walls
 
 vertices_roof = np.zeros(len(roof), [("position", np.float32,3)])
 vertices_roof["position"] = roof
+
+vertices_floor = np.zeros(len(floor), [("position", np.float32,3)])
+vertices_floor["position"] = floor
 
 # ---------------------------------------
 # MATRIZES
@@ -219,9 +248,10 @@ loc_color = glGetUniformLocation(program,"color")
 # house
 house_walls = SceneObject(vertices_walls)
 house_roof  = SceneObject(vertices_roof)
+floor = SceneObject(vertices_floor)
 
 
-for obj in [house_walls, house_roof]:
+for obj in [house_walls, house_roof, floor]:
     obj.tx = 0
 
 
@@ -240,12 +270,17 @@ while not glfw.window_should_close(window):
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
     glClearColor(1,1,1,1)
 
-    """ # animations
-    house1.angle += 0.01
-    house2.tx += 0.001
-    house3.ty = math.sin(glfw.get_time()) * 0.2 """
 
-    # draw objects
+    house_roof.angle += 0.01
+    house_walls.angle += 0.01
+
+    house_walls.ty += 0.001
+    house_roof.ty += 0.001
+
+    house_walls.scale *= 0.999
+    house_roof.scale *= 0.999
+
+    # desenhar objetos
 
     # HOUSE
     glUniform4f(loc_color, 0.9, 0.8, 0.4, 1)
@@ -253,6 +288,9 @@ while not glfw.window_should_close(window):
 
     glUniform4f(loc_color, 0.4, 0.2, 0.1, 1)
     house_roof.draw()
+
+    glUniform4f(loc_color, 0.7, 0.9, 0.4, 1)
+    floor.draw()
 
 
     glfw.swap_buffers(window)
