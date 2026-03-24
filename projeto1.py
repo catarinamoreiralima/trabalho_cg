@@ -142,7 +142,7 @@ def create_dome(radius, height, segments=40, rings=10):
 
     return vertices
 
-oval = oval = create_flat_sphere(0.5, 0.15, 0.5)
+oval = create_flat_sphere(0.5, 0.15, 0.5)
 dome = create_dome(0.2, 0.1, segments=40, rings=10)
 
 vertices_oval = np.zeros(len(oval), [("position", np.float32,3)])
@@ -343,6 +343,22 @@ floor = SceneObject(vertices_floor)
 ufo_base = SceneObject(vertices_oval)
 ufo_top = SceneObject(vertices_top)
 
+oval_nuvem1 = create_flat_sphere(0.8, 0.8, 0.8)
+oval_nuvem2 = create_flat_sphere(0.6, 0.6, 0.6)
+oval_nuvem3 = create_flat_sphere(0.7, 0.7, 0.7)
+
+oval_nuvem1_vertices = np.zeros(len(oval_nuvem1), [("position", np.float32,3)])
+oval_nuvem1_vertices["position"] = oval_nuvem1  
+
+oval_nuvem2_vertices = np.zeros(len(oval_nuvem2), [("position", np.float32,3)])
+oval_nuvem2_vertices["position"] = oval_nuvem2  
+
+oval_nuvem3_vertices = np.zeros(len(oval_nuvem3), [("position", np.float32,3)])
+oval_nuvem3_vertices["position"] = oval_nuvem3
+
+object_nuvem1 = SceneObject(oval_nuvem1_vertices)
+object_nuvem2 = SceneObject(oval_nuvem2_vertices)
+object_nuvem3 = SceneObject(oval_nuvem3_vertices)
 
 for obj in [house_walls, house_roof, floor, ufo_base, ufo_top]:
     obj.tx = 0
@@ -360,7 +376,9 @@ glEnable(GL_DEPTH_TEST)
 
 time = 0
 
-
+object_nuvem1.tx = -1
+object_nuvem2.tx = -0.7
+object_nuvem3.tx = -0.4
 
 while not glfw.window_should_close(window):
 
@@ -401,7 +419,8 @@ while not glfw.window_should_close(window):
 
     # desenhar objetos
 
-    #glPolygonMode(GL_FRONT_AND_BACK, GL_LINE)
+    # para desenhar em modo wireframe, descomente a linha abaixo
+    # glPolygonMode(GL_FRONT_AND_BACK, GL_LINE)
 
     # HOUSE
     glUniform4f(loc_color, 0.9, 0.8, 0.4, 1)
@@ -420,6 +439,28 @@ while not glfw.window_should_close(window):
     # topo
     glUniform4f(loc_color, 0.412, 0.412, 0.4, 1)
     ufo_top.draw()
+
+    # nuvens
+
+    glUniform4f(loc_color, 0.9, 0.9, 0.9, 1)
+    object_nuvem1.tx += 0.002
+    object_nuvem1.ty = 0.8 + 0.1 * math.sin(time * 0.3)
+    object_nuvem1.scale = 0.4
+    object_nuvem1.tz = 1
+    object_nuvem1.draw()   
+
+    object_nuvem2.tx += 0.002
+    object_nuvem2.ty = 0.8 + 0.1 * math.sin(time * 0.3 + 1)
+    object_nuvem2.scale = 0.4
+    object_nuvem2.tz = 1
+    object_nuvem2.draw()    
+
+    object_nuvem3.tx += 0.002
+    object_nuvem3.ty = 0.8 + 0.1 * math.sin(time * 0.3 + 2)
+    object_nuvem3.scale = 0.4
+    object_nuvem3.tz = 1
+    object_nuvem3.draw()
+
 
     
 
