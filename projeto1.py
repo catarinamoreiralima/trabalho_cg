@@ -65,31 +65,54 @@ glUseProgram(program)
 # ---------------------------------------
 
 
-def create_oval(rx, ry, z, segments=40):
+def create_flat_sphere(rx, ry, rz, segments=40, rings=20):
     vertices = []
 
-    for i in range(segments):
-        theta1 = 2 * math.pi * i / segments
-        theta2 = 2 * math.pi * (i+1) / segments
+    for i in range(rings):
+        phi1 = math.pi * i / rings - math.pi / 2
+        phi2 = math.pi * (i + 1) / rings - math.pi / 2
 
-        # centro
-        vertices.append((0, 0, z))
+        for j in range(segments):
+            theta1 = 2 * math.pi * j / segments
+            theta2 = 2 * math.pi * (j + 1) / segments
 
-        # ponto 1
-        vertices.append((
-            rx * math.cos(theta1),
-            ry * math.sin(theta1),
-            z
-        ))
+            # pontos
+            p1 = (
+                rx * math.cos(phi1) * math.cos(theta1),
+                ry * math.sin(phi1),
+                rz * math.cos(phi1) * math.sin(theta1)
+            )
 
-        # ponto 2
-        vertices.append((
-            rx * math.cos(theta2),
-            ry * math.sin(theta2),
-            z
-        ))
+            p2 = (
+                rx * math.cos(phi2) * math.cos(theta1),
+                ry * math.sin(phi2),
+                rz * math.cos(phi2) * math.sin(theta1)
+            )
+
+            p3 = (
+                rx * math.cos(phi2) * math.cos(theta2),
+                ry * math.sin(phi2),
+                rz * math.cos(phi2) * math.sin(theta2)
+            )
+
+            p4 = (
+                rx * math.cos(phi1) * math.cos(theta2),
+                ry * math.sin(phi1),
+                rz * math.cos(phi1) * math.sin(theta2)
+            )
+
+            # triângulo 1
+            vertices.append(p1)
+            vertices.append(p2)
+            vertices.append(p3)
+
+            # triângulo 2
+            vertices.append(p1)
+            vertices.append(p3)
+            vertices.append(p4)
 
     return vertices
+
 def create_dome(radius, height, segments=40, rings=10):
     vertices = []
 
@@ -119,7 +142,7 @@ def create_dome(radius, height, segments=40, rings=10):
 
     return vertices
 
-oval = create_oval(0.5, 0.15, 0)
+oval = oval = create_flat_sphere(0.5, 0.15, 0.5)
 dome = create_dome(0.2, 0.1, segments=40, rings=10)
 
 vertices_oval = np.zeros(len(oval), [("position", np.float32,3)])
@@ -211,6 +234,8 @@ floor = [
 ( 1.0, -1, -1.0), ( 1.0, -0.21,  1.0), ( 1.0, -0.21,  1.0),
 ( 1.0, -1, -1.0), ( 1.0, -0.21,  1.0), ( 1.0, -0.21, -1.0),
 ]
+
+
 
 walls = cube + cube_sides
 roof = pyramid + pyramid_sides + pyramid_base
