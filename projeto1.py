@@ -61,64 +61,129 @@ glLinkProgram(program)
 glUseProgram(program)
 
 # ---------------------------------------
-# GEOMETRIA CASA
+# GEOMETRIAS
 # ---------------------------------------
+
+
+def create_oval(rx, ry, z, segments=40):
+    vertices = []
+
+    for i in range(segments):
+        theta1 = 2 * math.pi * i / segments
+        theta2 = 2 * math.pi * (i+1) / segments
+
+        # centro
+        vertices.append((0, 0, z))
+
+        # ponto 1
+        vertices.append((
+            rx * math.cos(theta1),
+            ry * math.sin(theta1),
+            z
+        ))
+
+        # ponto 2
+        vertices.append((
+            rx * math.cos(theta2),
+            ry * math.sin(theta2),
+            z
+        ))
+
+    return vertices
+def create_dome(radius, height, segments=40, rings=10):
+    vertices = []
+
+    for i in range(rings):
+        phi1 = (math.pi / 2) * i / rings
+        phi2 = (math.pi / 2) * (i + 1) / rings
+
+        y1 = height * math.sin(phi1)
+        y2 = height * math.sin(phi2)
+
+        r1 = radius * math.cos(phi1)
+        r2 = radius * math.cos(phi2)
+
+        for j in range(segments):
+            theta1 = 2 * math.pi * j / segments
+            theta2 = 2 * math.pi * (j + 1) / segments
+
+            # triângulo 1
+            vertices.append((r1 * math.cos(theta1), y1, r1 * math.sin(theta1)))
+            vertices.append((r2 * math.cos(theta1), y2, r2 * math.sin(theta1)))
+            vertices.append((r2 * math.cos(theta2), y2, r2 * math.sin(theta2)))
+
+            # triângulo 2
+            vertices.append((r1 * math.cos(theta1), y1, r1 * math.sin(theta1)))
+            vertices.append((r2 * math.cos(theta2), y2, r2 * math.sin(theta2)))
+            vertices.append((r1 * math.cos(theta2), y1, r1 * math.sin(theta2)))
+
+    return vertices
+
+oval = create_oval(0.5, 0.15, 0)
+dome = create_dome(0.2, 0.1, segments=40, rings=10)
+
+vertices_oval = np.zeros(len(oval), [("position", np.float32,3)])
+vertices_oval["position"] = oval
+
+vertices_top = np.zeros(len(dome), [("position", np.float32,3)])
+vertices_top["position"] = dome
+
+
 
 cube = [
 
-(-0.1923,-0.20, 0.0897), ( 0.0897,-0.20, 0.1923), ( 0.0897, 0.00, 0.1923),
-(-0.1923,-0.20, 0.0897), ( 0.0897, 0.00, 0.1923), (-0.1923, 0.00, 0.0897),
+(-0.20,-0.20, 0.00), ( 0.00,-0.20, 0.20), ( 0.00, 0.00, 0.20),
+(-0.20,-0.20, 0.0897), ( 0.0897, 0.00, 0.20), (-0.20, 0.00, 0.00),
 
-(-0.0897,-0.20,-0.1923), ( 0.1923, 0.00,-0.0897), ( 0.1923,-0.20,-0.0897),
-(-0.0897,-0.20,-0.1923), (-0.0897, 0.00,-0.1923), ( 0.1923, 0.00,-0.0897),
+(-0.00,-0.20,-0.20), ( 0.20, 0.00,-0.00), ( 0.20,-0.20,-0.00),
+(-0.00,-0.20,-0.20), (-0.00, 0.00,-0.20), ( 0.20, 0.00,-0.00),
 
-(-0.0897,0.00,-0.1923), (-0.1923,0.00,0.0897), (0.0897,0.00,0.1923),
-(-0.0897,0.00,-0.1923), (0.0897,0.00,0.1923), (0.1923,0.00,-0.0897),
+(-0.00,0.00,-0.20), (-0.20,0.00,0.00), (0.00, 0.00,0.20),
+(-0.00 ,0.00,-0.20), (0.00 ,0.00,0.20), (0.20 ,0.00, -0.00),
 
-(-0.0897,-0.20,-0.1923), (0.0897,-0.20,0.1923), (-0.1923,-0.20,0.0897),
-(-0.0897,-0.20,-0.1923), (0.1923,-0.20,-0.0897), (0.0897,-0.20,0.1923)
+(-0.00,-0.20,-0.20), (0.00,-0.20,0.20), (-0.20,-0.20,0.00),
+(-0.00,-0.20,-0.20), (0.20,-0.20,-0.00), (0.00,-0.20,0.20)
 ]
 
 cube_sides = [
 
-(-0.0897,-0.20,-0.1923), (-0.1923,-0.20, 0.0897), (-0.1923, 0.00, 0.0897),
-(-0.0897,-0.20,-0.1923), (-0.1923, 0.00, 0.0897), (-0.0897, 0.00,-0.1923),
+(-0.00,-0.20,-0.20), (-0.20,-0.20, 0.00), (-0.20, 0.00, 0.00),
+(-0.00,-0.20,-0.20), (-0.20, 0.00, 0.00), (-0.00, 0.00,-0.20),
 
-(0.1923,-0.20,-0.0897), (0.0897, 0.00, 0.1923), (0.0897,-0.20, 0.1923),
-(0.1923,-0.20,-0.0897), (0.1923, 0.00,-0.0897), (0.0897, 0.00, 0.1923)
+( 0.20,-0.20,-0.00), ( 0.00,-0.20, 0.20), ( 0.00, 0.00, 0.20),
+( 0.20,-0.20,-0.00), ( 0.00, 0.00, 0.20), ( 0.20, 0.00,-0.00)
+
 ]
 
 pyramid = [
 
-(-0.1923,0.00, 0.0897),
-( 0.0897,0.00, 0.1923),
-( 0.0000,0.15, 0.0000),
+(-0.20,0.00, 0.00), ( 0.00,0.00, 0.20), ( 0.00,0.15, 0.0000),
 
-( 0.1923,0.00,-0.0897),
-(-0.0897,0.00,-0.1923),
+( 0.20,0.00,-0.00),
+(-0.0,0.00,-0.20),
 ( 0.0000,0.15, 0.0000)
 ]
 
 pyramid_sides = [
 
-( 0.0897,0.00, 0.1923),
-( 0.1923,0.00,-0.0897),
+( 0.0,0.00, 0.20),
+( 0.20,0.00,-0.00),
 ( 0.0000,0.15, 0.0000),
 
-(-0.0897,0.00,-0.1923),
-(-0.1923,0.00, 0.0897),
+(-0.00,0.00,-0.20),
+(-0.20,0.00, 0.00),
 ( 0.0000,0.15, 0.0000)
 ]
 
 pyramid_base = [
 
-(-0.1923,0.00, 0.0897),
-( 0.0897,0.00, 0.1923),
-( 0.1923,0.00,-0.0897),
+(-0.20,0.00, 0.00),
+( 0.00,0.00, 0.20),
+( 0.20,0.00,-0.00),
 
-(-0.1923,0.00, 0.0897),
-( 0.1923,0.00,-0.0897),
-(-0.0897,0.00,-0.1923)
+(-0.20,0.00, 0.00),
+( 0.20,0.00,-0.00),
+(-0.0,0.00,-0.20)
 ]
 
 floor = [
@@ -250,8 +315,11 @@ house_walls = SceneObject(vertices_walls)
 house_roof  = SceneObject(vertices_roof)
 floor = SceneObject(vertices_floor)
 
+ufo_base = SceneObject(vertices_oval)
+ufo_top = SceneObject(vertices_top)
 
-for obj in [house_walls, house_roof, floor]:
+
+for obj in [house_walls, house_roof, floor, ufo_base, ufo_top]:
     obj.tx = 0
 
 
@@ -265,7 +333,13 @@ glEnable(GL_DEPTH_TEST)
 # LOOP PRINCIPAL
 # ---------------------------------------
 
+time = 0
+
+
+
 while not glfw.window_should_close(window):
+
+    time += 0.02
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
     glClearColor(0.5,0.7,1,1)
@@ -280,7 +354,29 @@ while not glfw.window_should_close(window):
     house_walls.scale *= 0.999
     house_roof.scale *= 0.999
 
+    ufo_base.tz = -0.5
+    ufo_base.scale = 0.8
+
+    ufo_top.tz = -0.6
+    ufo_top.scale = 0.8
+
+
+    # movimento vertical (flutuar)
+    ufo_base.ty = 0.8 + 0.05 * math.sin(time)
+    ufo_top.ty  = 0.9 + 0.05 * math.sin(time)
+
+# movimento lateral leve
+    ufo_base.tx = 0.1 * math.cos(time * 0.5)
+    ufo_top.tx  = 0.1 * math.cos(time * 0.5)
+
+# leve inclinação (balançando)
+    ufo_base.angle = 0.2 * math.sin(time)
+    ufo_top.angle  = 0.2 * math.sin(time)
+
+
     # desenhar objetos
+
+    #glPolygonMode(GL_FRONT_AND_BACK, GL_LINE)
 
     # HOUSE
     glUniform4f(loc_color, 0.9, 0.8, 0.4, 1)
@@ -291,6 +387,16 @@ while not glfw.window_should_close(window):
 
     glUniform4f(loc_color, 0.7, 0.9, 0.4, 1)
     floor.draw()
+
+    # base
+    glUniform4f(loc_color, 0.651, 0.651, 0.635, 1)
+    ufo_base.draw()
+
+    # topo
+    glUniform4f(loc_color, 0.412, 0.412, 0.4, 1)
+    ufo_top.draw()
+
+    
 
 
     glfw.swap_buffers(window)
