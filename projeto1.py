@@ -204,10 +204,12 @@ def create_truncated_cone(r_bottom, r_top, height, segments=40):
 
     return vertices
 
+#laser de abdução
 laser = create_truncated_cone(0.1, 0.05, 0.5, segments=40)
 vertices_laser = np.zeros(len(laser), [("position", np.float32,3)])
 vertices_laser["position"] = laser
 
+#ufo
 oval = create_flat_sphere(0.5, 0.15, 0.5)
 dome = create_dome(0.2, 0.1, segments=40, rings=10)
 
@@ -217,6 +219,8 @@ vertices_oval["position"] = oval
 vertices_top = np.zeros(len(dome), [("position", np.float32,3)])
 vertices_top["position"] = dome
 
+
+#grama
 grass_vertices = []
 
 for i in range(100):  # quantidade de gramas
@@ -312,7 +316,7 @@ floor = [
 ( 1.0, -1, -1.0), ( 1.0, -0.21,  1.0), ( 1.0, -0.21, -1.0),
 ]
 
-
+#casa
 
 walls = cube + cube_sides
 roof = pyramid + pyramid_sides + pyramid_base
@@ -325,6 +329,21 @@ vertices_roof["position"] = roof
 
 vertices_floor = np.zeros(len(floor), [("position", np.float32,3)])
 vertices_floor["position"] = floor
+
+# nuvem
+oval_nuvem1 = create_flat_sphere(0.8, 0.8, 0.8)
+oval_nuvem2 = create_flat_sphere(0.6, 0.6, 0.6)
+oval_nuvem3 = create_flat_sphere(0.7, 0.7, 0.7)
+
+oval_nuvem1_vertices = np.zeros(len(oval_nuvem1), [("position", np.float32,3)])
+oval_nuvem1_vertices["position"] = oval_nuvem1  
+
+oval_nuvem2_vertices = np.zeros(len(oval_nuvem2), [("position", np.float32,3)])
+oval_nuvem2_vertices["position"] = oval_nuvem2  
+
+oval_nuvem3_vertices = np.zeros(len(oval_nuvem3), [("position", np.float32,3)])
+oval_nuvem3_vertices["position"] = oval_nuvem3
+
 
 # ---------------------------------------
 # MATRIZES
@@ -420,18 +439,6 @@ floor = SceneObject(vertices_floor)
 ufo_base = SceneObject(vertices_oval)
 ufo_top = SceneObject(vertices_top)
 
-oval_nuvem1 = create_flat_sphere(0.8, 0.8, 0.8)
-oval_nuvem2 = create_flat_sphere(0.6, 0.6, 0.6)
-oval_nuvem3 = create_flat_sphere(0.7, 0.7, 0.7)
-
-oval_nuvem1_vertices = np.zeros(len(oval_nuvem1), [("position", np.float32,3)])
-oval_nuvem1_vertices["position"] = oval_nuvem1  
-
-oval_nuvem2_vertices = np.zeros(len(oval_nuvem2), [("position", np.float32,3)])
-oval_nuvem2_vertices["position"] = oval_nuvem2  
-
-oval_nuvem3_vertices = np.zeros(len(oval_nuvem3), [("position", np.float32,3)])
-oval_nuvem3_vertices["position"] = oval_nuvem3
 
 object_nuvem1 = SceneObject(oval_nuvem1_vertices)
 object_nuvem2 = SceneObject(oval_nuvem2_vertices)
@@ -462,7 +469,7 @@ object_nuvem2.tx = -0.7
 object_nuvem3.tx = -0.4
 
 
-object_grass = SceneObject(vertices_grass)
+#object_grass = SceneObject(vertices_grass)
 
 while not glfw.window_should_close(window):
 
@@ -533,6 +540,7 @@ while not glfw.window_should_close(window):
     object_nuvem1.tz = 1
     object_nuvem1.draw()   
 
+    glUniform4f(loc_color, 0.87, 0.87, 0.87, 1)
     object_nuvem2.tx += 0.002
     object_nuvem2.ty = 0.8 + 0.1 * math.sin(time * 0.3 + 1)
     object_nuvem2.scale = 0.4
