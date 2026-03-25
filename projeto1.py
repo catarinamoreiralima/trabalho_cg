@@ -64,6 +64,21 @@ glUseProgram(program)
 # GEOMETRIAS
 # ---------------------------------------
 
+def create_grass(x, z, size=0.05):
+    vertices = []
+
+    # triângulo 1
+    vertices.append((x, -0.21, z))
+    vertices.append((x - size/2, size, z))
+    vertices.append((x + size/2, size, z))
+
+    # triângulo 2 (cruzado, mais volumoso)
+    vertices.append((x, -0.21, z))
+    vertices.append((x, size, z - size/2))
+    vertices.append((x, size, z + size/2))
+
+    return vertices
+
 
 def create_flat_sphere(rx, ry, rz, segments=40, rings=20):
     vertices = []
@@ -142,6 +157,57 @@ def create_dome(radius, height, segments=40, rings=10):
 
     return vertices
 
+def create_truncated_cone(r_bottom, r_top, height, segments=40):
+    vertices = []
+
+    y_bottom = -height / 2
+    y_top = height / 2
+
+    for i in range(segments):
+        theta1 = 2 * math.pi * i / segments
+        theta2 = 2 * math.pi * (i + 1) / segments
+
+        # pontos base inferior
+        b1 = (r_bottom * math.cos(theta1), y_bottom, r_bottom * math.sin(theta1))
+        b2 = (r_bottom * math.cos(theta2), y_bottom, r_bottom * math.sin(theta2))
+
+        # pontos base superior
+        t1 = (r_top * math.cos(theta1), y_top, r_top * math.sin(theta1))
+        t2 = (r_top * math.cos(theta2), y_top, r_top * math.sin(theta2))
+
+        # -----------------
+        # LATERAIS
+        # -----------------
+        # triângulo 1
+        vertices.append(b1)
+        vertices.append(t1)
+        vertices.append(t2)
+
+        # triângulo 2
+        vertices.append(b1)
+        vertices.append(t2)
+        vertices.append(b2)
+
+        # -----------------
+        # BASE INFERIOR
+        # -----------------
+        vertices.append((0, y_bottom, 0))
+        vertices.append(b2)
+        vertices.append(b1)
+
+        # -----------------
+        # BASE SUPERIOR
+        # -----------------
+        vertices.append((0, y_top, 0))
+        vertices.append(t1)
+        vertices.append(t2)
+
+    return vertices
+
+laser = create_truncated_cone(0.1, 0.05, 0.5, segments=40)
+vertices_laser = np.zeros(len(laser), [("position", np.float32,3)])
+vertices_laser["position"] = laser
+
 oval = create_flat_sphere(0.5, 0.15, 0.5)
 dome = create_dome(0.2, 0.1, segments=40, rings=10)
 
@@ -150,6 +216,17 @@ vertices_oval["position"] = oval
 
 vertices_top = np.zeros(len(dome), [("position", np.float32,3)])
 vertices_top["position"] = dome
+
+grass_vertices = []
+
+for i in range(100):  # quantidade de gramas
+    x = np.random.uniform(-1, 1)
+    z = np.random.uniform(-1, 1)
+
+    grass_vertices += create_grass(x, z, size=0.05)
+
+vertices_grass = np.zeros(len(grass_vertices), [("position", np.float32,3)])
+vertices_grass["position"] = grass_vertices
 
 
 
@@ -360,6 +437,8 @@ object_nuvem1 = SceneObject(oval_nuvem1_vertices)
 object_nuvem2 = SceneObject(oval_nuvem2_vertices)
 object_nuvem3 = SceneObject(oval_nuvem3_vertices)
 
+object_laser = SceneObject(vertices_laser)
+
 for obj in [house_walls, house_roof, floor, ufo_base, ufo_top]:
     obj.tx = 0
 
@@ -369,6 +448,8 @@ for obj in [house_walls, house_roof, floor, ufo_base, ufo_top]:
 # ---------------------------------------
 
 glEnable(GL_DEPTH_TEST)
+glEnable(GL_BLEND)
+glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
 
 # ---------------------------------------
 # LOOP PRINCIPAL
@@ -379,6 +460,9 @@ time = 0
 object_nuvem1.tx = -1
 object_nuvem2.tx = -0.7
 object_nuvem3.tx = -0.4
+
+
+object_grass = SceneObject(vertices_grass)
 
 while not glfw.window_should_close(window):
 
@@ -460,6 +544,14 @@ while not glfw.window_should_close(window):
     object_nuvem3.scale = 0.4
     object_nuvem3.tz = 1
     object_nuvem3.draw()
+
+    #glUniform4f(loc_color, 0.365, 0.58, 0.035, 1)
+    #object_grass.draw()
+
+
+    glUniform4f(loc_color,0.031, 1, 0.345, 0.5)
+    object_laser.scale = 3
+    object_laser.draw()
 
 
     
