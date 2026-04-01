@@ -468,10 +468,80 @@ object_nuvem1.tx = -1
 object_nuvem2.tx = -0.7
 object_nuvem3.tx = -0.4
 
+wireframe = False
 
-#object_grass = SceneObject(vertices_grass)
+def key_event(window, key, scancode, action, mods):
+    global wireframe
+    if action == glfw.PRESS or action == glfw.REPEAT:
+
+        #wireframe
+
+        if key == glfw.KEY_P:
+            wireframe = not wireframe
+
+        #nuvens
+        # mover para esquerda (A)
+        if key == glfw.KEY_A:
+            object_nuvem1.tx -= 0.05
+            object_nuvem2.tx -= 0.05
+            object_nuvem3.tx -= 0.05
+
+        # mover para direita (D)
+        if key == glfw.KEY_D:
+            object_nuvem1.tx += 0.05
+            object_nuvem2.tx += 0.05
+            object_nuvem3.tx += 0.05
+
+        # UFO + laser
+
+        # movimento lateral (Q esquerda, E direita)
+        if glfw.get_key(window, glfw.KEY_Q) == glfw.PRESS:
+            ufo_base.tx -= 0.02
+            ufo_top.tx  -= 0.02
+            object_laser.tx -= 0.02
+
+        if glfw.get_key(window, glfw.KEY_E) == glfw.PRESS:
+            ufo_base.tx += 0.02
+            ufo_top.tx  += 0.02
+            object_laser.tx += 0.02
+
+        # casa
+
+        # movimento vertical (I sobe, J desce)
+        if glfw.get_key(window, glfw.KEY_I) == glfw.PRESS:
+            house_walls.ty += 0.02
+            house_roof.ty  += 0.02
+
+        if glfw.get_key(window, glfw.KEY_J) == glfw.PRESS:
+            house_walls.ty -= 0.02
+            house_roof.ty  -= 0.02
+
+
+        # rotação (O horário, U anti-horário)
+        if glfw.get_key(window, glfw.KEY_O) == glfw.PRESS:
+            house_walls.angle -= 0.02
+            house_roof.angle  -= 0.02
+
+        if glfw.get_key(window, glfw.KEY_U) == glfw.PRESS:
+            house_walls.angle += 0.02
+            house_roof.angle  += 0.02
+
+
+        # escala (X aumenta, Z diminui)
+        if glfw.get_key(window, glfw.KEY_X) == glfw.PRESS:
+            house_walls.scale += 0.01
+            house_roof.scale  += 0.01
+
+        if glfw.get_key(window, glfw.KEY_Z) == glfw.PRESS:
+            house_walls.scale -= 0.01
+            house_roof.scale  -= 0.01
+
+
+
 
 while not glfw.window_should_close(window):
+
+    glfw.set_key_callback(window, key_event)
 
     time += 0.02
 
@@ -479,14 +549,8 @@ while not glfw.window_should_close(window):
     glClearColor(0.5,0.7,1,1)
 
 
-    house_roof.angle += 0.01
-    house_walls.angle += 0.01
 
-    house_walls.ty += 0.001
-    house_roof.ty += 0.001
-
-    house_walls.scale *= 0.999
-    house_roof.scale *= 0.999
+    ##POSICIONAMENTO E BALANÇO DO UFO
 
     ufo_base.tz = -0.5
     ufo_base.scale = 0.8
@@ -499,21 +563,36 @@ while not glfw.window_should_close(window):
     ufo_base.ty = 0.8 + 0.05 * math.sin(time)
     ufo_top.ty  = 0.9 + 0.05 * math.sin(time)
 
-# movimento lateral leve
-    ufo_base.tx = 0.1 * math.cos(time * 0.5)
-    ufo_top.tx  = 0.1 * math.cos(time * 0.5)
-
-# leve inclinação (balançando)
+    # leve inclinação (balançando)
     ufo_base.angle = 0.2 * math.sin(time)
     ufo_top.angle  = 0.2 * math.sin(time)
 
+    #MOVIMENTO DAS NUVENS
 
-    # desenhar objetos
+    object_nuvem1.ty = 0.8 + 0.1 * math.sin(time * 0.3)
+    object_nuvem1.scale = 0.4
+    object_nuvem1.tz = 1
 
-    # para desenhar em modo wireframe, descomente a linha abaixo
-    # glPolygonMode(GL_FRONT_AND_BACK, GL_LINE)
+    object_nuvem2.ty = 0.8 + 0.1 * math.sin(time * 0.3 + 1)
+    object_nuvem2.scale = 0.4
+    object_nuvem2.tz = 1
 
-    # HOUSE
+    object_nuvem3.ty = 0.8 + 0.1 * math.sin(time * 0.3 + 2)
+    object_nuvem3.scale = 0.4
+    object_nuvem3.tz = 1
+
+
+
+    # WIREFRAME 
+
+    if wireframe:
+        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE)
+    else:
+        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL)
+
+    # OBJETOS:
+
+    #CASA
     glUniform4f(loc_color, 0.9, 0.8, 0.4, 1)
     house_walls.draw()
 
@@ -523,40 +602,26 @@ while not glfw.window_should_close(window):
     glUniform4f(loc_color, 0.7, 0.9, 0.4, 1)
     floor.draw()
 
-    # base
+
+    #UFO
     glUniform4f(loc_color, 0.651, 0.651, 0.635, 1)
     ufo_base.draw()
 
-    # topo
     glUniform4f(loc_color, 0.412, 0.412, 0.4, 1)
     ufo_top.draw()
 
-    # nuvens
+    #NUVENS
 
     glUniform4f(loc_color, 0.9, 0.9, 0.9, 1)
-    object_nuvem1.tx += 0.002
-    object_nuvem1.ty = 0.8 + 0.1 * math.sin(time * 0.3)
-    object_nuvem1.scale = 0.4
-    object_nuvem1.tz = 1
     object_nuvem1.draw()   
 
     glUniform4f(loc_color, 0.87, 0.87, 0.87, 1)
-    object_nuvem2.tx += 0.002
-    object_nuvem2.ty = 0.8 + 0.1 * math.sin(time * 0.3 + 1)
-    object_nuvem2.scale = 0.4
-    object_nuvem2.tz = 1
-    object_nuvem2.draw()    
+    object_nuvem2.draw()  
 
-    object_nuvem3.tx += 0.002
-    object_nuvem3.ty = 0.8 + 0.1 * math.sin(time * 0.3 + 2)
-    object_nuvem3.scale = 0.4
-    object_nuvem3.tz = 1
+    glUniform4f(loc_color, 0.85, 0.85, 0.85, 1)  
     object_nuvem3.draw()
 
-    #glUniform4f(loc_color, 0.365, 0.58, 0.035, 1)
-    #object_grass.draw()
-
-
+    #LASER
     glUniform4f(loc_color,0.031, 1, 0.345, 0.5)
     object_laser.scale = 3
     object_laser.draw()
