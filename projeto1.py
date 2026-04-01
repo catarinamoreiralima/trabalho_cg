@@ -234,57 +234,64 @@ vertices_grass["position"] = grass_vertices
 
 
 
-cube = [
 
+walls1 = [
+# face 1
 (-0.20,-0.20, 0.00), ( 0.00,-0.20, 0.20), ( 0.00, 0.00, 0.20),
-(-0.20,-0.20, 0.0897), ( 0.0897, 0.00, 0.20), (-0.20, 0.00, 0.00),
+(-0.20,-0.20, 0.00), ( 0.00, 0.00, 0.20), (-0.20, 0.00, 0.00),
 
-(-0.00,-0.20,-0.20), ( 0.20, 0.00,-0.00), ( 0.20,-0.20,-0.00),
-(-0.00,-0.20,-0.20), (-0.00, 0.00,-0.20), ( 0.20, 0.00,-0.00),
-
+# face 3
 (-0.00,0.00,-0.20), (-0.20,0.00,0.00), (0.00, 0.00,0.20),
 (-0.00 ,0.00,-0.20), (0.00 ,0.00,0.20), (0.20 ,0.00, -0.00),
 
-(-0.00,-0.20,-0.20), (0.00,-0.20,0.20), (-0.20,-0.20,0.00),
-(-0.00,-0.20,-0.20), (0.20,-0.20,-0.00), (0.00,-0.20,0.20)
+# face 5 (lateral)
+(-0.00,-0.20,-0.20), (-0.20,-0.20, 0.00), (-0.20, 0.00, 0.00),
+(-0.00,-0.20,-0.20), (-0.20, 0.00, 0.00), (-0.00, 0.00,-0.20)
 ]
 
-cube_sides = [
+walls2 = [
+# face 2
+(-0.00,-0.20,-0.20), ( 0.20, 0.00,-0.00), ( 0.20,-0.20,-0.00),
+(-0.00,-0.20,-0.20), (-0.00, 0.00,-0.20), ( 0.20, 0.00,-0.00),
 
-(-0.00,-0.20,-0.20), (-0.20,-0.20, 0.00), (-0.20, 0.00, 0.00),
-(-0.00,-0.20,-0.20), (-0.20, 0.00, 0.00), (-0.00, 0.00,-0.20),
+# face 4
+(-0.00,-0.20,-0.20), (0.00,-0.20,0.20), (-0.20,-0.20,0.00),
+(-0.00,-0.20,-0.20), (0.20,-0.20,-0.00), (0.00,-0.20,0.20),
 
+# face 6 (lateral)
 ( 0.20,-0.20,-0.00), ( 0.00,-0.20, 0.20), ( 0.00, 0.00, 0.20),
 ( 0.20,-0.20,-0.00), ( 0.00, 0.00, 0.20), ( 0.20, 0.00,-0.00)
-
 ]
 
-pyramid = [
 
+
+roof1 = [
+# face 1
 (-0.20,0.00, 0.00), ( 0.00,0.00, 0.20), ( 0.00,0.15, 0.0000),
 
-( 0.20,0.00,-0.00),
-(-0.0,0.00,-0.20),
-( 0.0000,0.15, 0.0000)
-]
-
-pyramid_sides = [
-
+# face 3
 ( 0.0,0.00, 0.20),
 ( 0.20,0.00,-0.00),
 ( 0.0000,0.15, 0.0000),
 
-(-0.00,0.00,-0.20),
-(-0.20,0.00, 0.00),
-( 0.0000,0.15, 0.0000)
-]
-
-pyramid_base = [
-
+# base 1
 (-0.20,0.00, 0.00),
 ( 0.00,0.00, 0.20),
-( 0.20,0.00,-0.00),
+( 0.20,0.00,-0.00)
+]
 
+roof2 = [
+# face 2
+( 0.20,0.00,-0.00),
+(-0.0,0.00,-0.20),
+( 0.0000,0.15, 0.0000),
+
+# face 4
+(-0.00,0.00,-0.20),
+(-0.20,0.00, 0.00),
+( 0.0000,0.15, 0.0000),
+
+# base 2
 (-0.20,0.00, 0.00),
 ( 0.20,0.00,-0.00),
 (-0.0,0.00,-0.20)
@@ -318,14 +325,20 @@ floor = [
 
 #casa
 
-walls = cube + cube_sides
-roof = pyramid + pyramid_sides + pyramid_base
 
-vertices_walls = np.zeros(len(walls), [("position", np.float32,3)])
-vertices_walls["position"] = walls
 
-vertices_roof = np.zeros(len(roof), [("position", np.float32,3)])
-vertices_roof["position"] = roof
+
+vertices_walls1 = np.zeros(len(walls1), [("position", np.float32,3)])
+vertices_walls1["position"] = walls1
+
+vertices_walls2 = np.zeros(len(walls2), [("position", np.float32,3)])
+vertices_walls2["position"] = walls2
+
+vertices_roof1 = np.zeros(len(roof1), [("position", np.float32,3)])
+vertices_roof1["position"] = roof1
+
+vertices_roof2 = np.zeros(len(roof2), [("position", np.float32,3)])
+vertices_roof2["position"] = roof2
 
 vertices_floor = np.zeros(len(floor), [("position", np.float32,3)])
 vertices_floor["position"] = floor
@@ -373,6 +386,7 @@ class SceneObject:
 
         self.angle = 0
         self.scale = 1
+        self.angle_y = 0
 
         self.VBO = glGenBuffers(1)
 
@@ -386,6 +400,9 @@ class SceneObject:
         c = math.cos(self.angle)
         s = math.sin(self.angle)
 
+        cy = math.cos(self.angle_y)
+        sy = math.sin(self.angle_y)
+
         mat_rot = np.array([
             c,-s,0,0,
             s,c,0,0,
@@ -393,6 +410,12 @@ class SceneObject:
             0,0,0,1
         ], np.float32)
 
+        mat_rot_y = np.array([
+            cy, 0, sy, 0,
+            0,  1, 0,  0,
+            -sy, 0, cy, 0,
+            0,  0, 0,  1
+        ], np.float32)
         mat_trans = np.array([
             1,0,0,self.tx,
             0,1,0,self.ty,
@@ -407,7 +430,8 @@ class SceneObject:
             0,0,0,1
         ], np.float32)
 
-        mat_temp = multiplica_matriz(mat_rot, mat_scale)
+        mat_r = multiplica_matriz(mat_rot, mat_rot_y)
+        mat_temp = multiplica_matriz(mat_r, mat_scale)
         mat_final = multiplica_matriz(mat_trans, mat_temp)
 
         glUniformMatrix4fv(loc_transform, 1, GL_TRUE, mat_final)
@@ -417,7 +441,7 @@ class SceneObject:
 # ATTRIBUTOS
 # ---------------------------------------
 
-stride = vertices_walls.strides[0]
+stride = vertices_walls1.strides[0]
 offset = ctypes.c_void_p(0)
 
 loc_position = glGetAttribLocation(program,"position")
@@ -432,8 +456,10 @@ loc_color = glGetUniformLocation(program,"color")
 
 
 # house
-house_walls = SceneObject(vertices_walls)
-house_roof  = SceneObject(vertices_roof)
+house_walls1 = SceneObject(vertices_walls1)
+house_walls2 = SceneObject(vertices_walls2)
+house_roof1 = SceneObject(vertices_roof1)
+house_roof2 = SceneObject(vertices_roof2)
 floor = SceneObject(vertices_floor)
 
 ufo_base = SceneObject(vertices_oval)
@@ -446,7 +472,7 @@ object_nuvem3 = SceneObject(oval_nuvem3_vertices)
 
 object_laser = SceneObject(vertices_laser)
 
-for obj in [house_walls, house_roof, floor, ufo_base, ufo_top]:
+for obj in [house_walls1, house_walls2, house_roof1, house_roof2, floor, ufo_base, ufo_top]:
     obj.tx = 0
 
 
@@ -509,33 +535,69 @@ def key_event(window, key, scancode, action, mods):
 
         # movimento vertical (I sobe, J desce)
         if glfw.get_key(window, glfw.KEY_I) == glfw.PRESS:
-            house_walls.ty += 0.02
-            house_roof.ty  += 0.02
+            house_walls1.ty += 0.02
+            house_walls2.ty += 0.02
+            house_roof1.ty  += 0.02
+            house_roof2.ty  += 0.02
 
         if glfw.get_key(window, glfw.KEY_J) == glfw.PRESS:
-            house_walls.ty -= 0.02
-            house_roof.ty  -= 0.02
+            house_walls1.ty -= 0.02
+            house_walls2.ty -= 0.02
+            house_roof1.ty  -= 0.02
+            house_roof2.ty  -= 0.02
 
 
         # rotação (O horário, U anti-horário)
         if glfw.get_key(window, glfw.KEY_O) == glfw.PRESS:
-            house_walls.angle -= 0.02
-            house_roof.angle  -= 0.02
+            house_walls1.angle -= 0.02
+            house_roof1.angle  -= 0.02
+            house_roof2.angle  -= 0.02
 
         if glfw.get_key(window, glfw.KEY_U) == glfw.PRESS:
-            house_walls.angle += 0.02
-            house_roof.angle  += 0.02
+            house_walls1.angle += 0.02
+            house_walls2.angle += 0.02
+            house_roof1.angle  += 0.02
+            house_roof2.angle  += 0.02
+
+            # rotação em Y (T e Y)
+        if glfw.get_key(window, glfw.KEY_T) == glfw.PRESS:
+            house_walls1.angle_y += 0.02
+            house_walls2.angle_y += 0.02
+            house_roof1.angle_y  += 0.02
+            house_roof2.angle_y  += 0.02
+
+        if glfw.get_key(window, glfw.KEY_Y) == glfw.PRESS:
+            house_walls1.angle_y -= 0.02
+            house_walls2.angle_y -= 0.02
+            house_roof1.angle_y  -= 0.02
+            house_roof2.angle_y  -= 0.02
 
 
         # escala (X aumenta, Z diminui)
         if glfw.get_key(window, glfw.KEY_X) == glfw.PRESS:
-            house_walls.scale += 0.01
-            house_roof.scale  += 0.01
+            house_walls1.scale += 0.01
+            house_walls2.scale += 0.01
+            house_roof1.scale  += 0.01
+            house_roof2.scale  += 0.01
 
         if glfw.get_key(window, glfw.KEY_Z) == glfw.PRESS:
-            house_walls.scale -= 0.01
-            house_roof.scale  -= 0.01
+            house_walls1.scale -= 0.01
+            house_walls2.scale -= 0.01
+            house_roof1.scale  -= 0.01
+            house_roof2.scale  -= 0.01
 
+#posicionamento e escala UFO
+
+ufo_base.tz = -0.5
+ufo_base.scale = 0.8
+
+ufo_top.tz = -0.6
+ufo_top.scale = 0.8
+
+ufo_base.tx = -0.5
+ufo_top.tx = -0.5
+
+object_laser.tx = -0.5
 
 
 
@@ -550,14 +612,7 @@ while not glfw.window_should_close(window):
 
 
 
-    ##POSICIONAMENTO E BALANÇO DO UFO
-
-    ufo_base.tz = -0.5
-    ufo_base.scale = 0.8
-
-    ufo_top.tz = -0.6
-    ufo_top.scale = 0.8
-
+    #BALANÇO DO UFO
 
     # movimento vertical (flutuar)
     ufo_base.ty = 0.8 + 0.05 * math.sin(time)
@@ -593,11 +648,17 @@ while not glfw.window_should_close(window):
     # OBJETOS:
 
     #CASA
-    glUniform4f(loc_color, 0.9, 0.8, 0.4, 1)
-    house_walls.draw()
+    glUniform4f(loc_color, 0.87, 0.35, 0.74, 1)
+    house_walls1.draw()
+
+    glUniform4f(loc_color, 0.9, 0.37, 0.76, 1)
+    house_walls2.draw()
 
     glUniform4f(loc_color, 0.4, 0.2, 0.1, 1)
-    house_roof.draw()
+    house_roof1.draw()
+
+    glUniform4f(loc_color, 0.47, 0.27, 0.17, 1)
+    house_roof2.draw()
 
     glUniform4f(loc_color, 0.7, 0.9, 0.4, 1)
     floor.draw()
