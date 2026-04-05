@@ -550,13 +550,23 @@ time = 0
 wireframe = False
 
 def key_event(window, key, scancode, action, mods):
-    global wireframe
+    global wireframe, laser_alpha
     if action == glfw.PRESS or action == glfw.REPEAT:
 
         #wireframe
 
         if key == glfw.KEY_P:
             wireframe = not wireframe
+
+        if key == glfw.KEY_C:  # aumenta opacidade
+            laser_alpha += 0.05
+            if laser_alpha > 1.0:
+                    laser_alpha = 1.0
+
+        if key == glfw.KEY_S:  # diminui opacidade
+            laser_alpha -= 0.05
+            if laser_alpha < 0.0:
+                laser_alpha = 0.0
 
         #nuvens
         # mover para esquerda (A)
@@ -723,7 +733,7 @@ for obj in [house_walls1, house_walls2, house_roof1, house_roof2, floor]:
     obj.tx = 0
 
 
-
+laser_alpha = 0.0
 
 while not glfw.window_should_close(window):
 
@@ -831,7 +841,7 @@ while not glfw.window_should_close(window):
 
     
  #LASER
-    glUniform4f(loc_color,0.031, 1, 0.345, 0.5)
+    glUniform4f(loc_color,0.031, 1, 0.345, laser_alpha)
     object_laser.scale = 3
     object_laser.draw()
 
