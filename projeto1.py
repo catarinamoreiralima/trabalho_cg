@@ -402,6 +402,11 @@ circle4 = create_circle(radius=0.1, segments=50, z=0.0)
 vertices_maca = np.zeros(len(circle4), [("position", np.float32,3)])
 vertices_maca["position"] = circle4
 
+stem = create_rectangle(-0.01, 0.0001, 0.01, 0.1, z=0.0)
+
+vertices_stem = np.zeros(len(stem), [("position", np.float32, 3)])
+vertices_stem["position"] = stem
+
 # ---------------------------------------
 # MATRIZES
 # ---------------------------------------
@@ -523,6 +528,7 @@ object_folha3 = SceneObject(vertices_circle3)
 object_rectangle = SceneObject(vertices_rectangle)
 
 object_maca = SceneObject(vertices_maca)
+object_stem = SceneObject(vertices_stem)
 
 
 
@@ -638,15 +644,19 @@ def key_event(window, key, scancode, action, mods):
 
         if key == glfw.KEY_F:
             object_maca.scale += 0.05
+            object_stem.scale += 0.05
 
         if key == glfw.KEY_G:
-            object_maca.scale -= 0.
+            object_maca.scale -= 0.05
+            object_stem.scale -= 0.05
             
         if key == glfw.KEY_R:
             object_maca.ty += 0.02
+            object_stem.ty += 0.02
 
         if key == glfw.KEY_V:
             object_maca.ty -= 0.02
+            object_stem.ty -= 0.02
 
 #posicionamento e escala UFO
 
@@ -699,7 +709,12 @@ object_folha3.scale = 0.7
 object_maca.tx = 0.8
 object_maca.ty = 0.2
 object_maca.tz = -0.8
-object_maca.scale = 0
+object_maca.scale = 0.3
+
+object_stem.tx = object_maca.tx
+object_stem.ty = object_maca.ty + 0.015
+object_stem.tz = object_maca.tz - 0.01
+object_stem.scale = 0.3
 ##
 
 
@@ -810,6 +825,9 @@ while not glfw.window_should_close(window):
 
     glUniform4f(loc_color, 0.812, 0.165, 0.165, 1)
     object_maca.draw()
+
+    glUniform4f(loc_color, 0.4, 0.2, 0.1, 1)
+    object_stem.draw()
 
     
  #LASER
