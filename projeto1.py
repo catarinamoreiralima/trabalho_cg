@@ -64,20 +64,6 @@ glUseProgram(program)
 # GEOMETRIAS
 # ---------------------------------------
 
-def create_grass(x, z, size=0.05):
-    vertices = []
-
-    # triângulo 1
-    vertices.append((x, -0.21, z))
-    vertices.append((x - size/2, size, z))
-    vertices.append((x + size/2, size, z))
-
-    # triângulo 2 (cruzado, mais volumoso)
-    vertices.append((x, -0.21, z))
-    vertices.append((x, size, z - size/2))
-    vertices.append((x, size, z + size/2))
-
-    return vertices
 
 
 def create_flat_sphere(rx, ry, rz, segments=40, rings=20):
@@ -125,6 +111,25 @@ def create_flat_sphere(rx, ry, rz, segments=40, rings=20):
             vertices.append(p1)
             vertices.append(p3)
             vertices.append(p4)
+
+    return vertices
+
+def create_circle(radius=0.5, segments=40, z=0.0):
+    vertices = []
+
+    for i in range(segments):
+        theta1 = 2 * math.pi * i / segments
+        theta2 = 2 * math.pi * (i + 1) / segments
+
+        center = (0.0, 0.0, z)
+
+        p1 = (radius * math.cos(theta1), radius * math.sin(theta1), z)
+        p2 = (radius * math.cos(theta2), radius * math.sin(theta2), z)
+
+        # triângulo
+        vertices.append(center)
+        vertices.append(p1)
+        vertices.append(p2)
 
     return vertices
 
@@ -220,26 +225,22 @@ vertices_top = np.zeros(len(dome), [("position", np.float32,3)])
 vertices_top["position"] = dome
 
 
-#grama
-grass_vertices = []
 
-for i in range(100):  # quantidade de gramas
-    x = np.random.uniform(-1, 1)
-    z = np.random.uniform(-1, 1)
+def create_rectangle(x1, y1, x2, y2, z=0.0):
+    return [
+        (x1, y1, z),
+        (x2, y1, z),
+        (x2, y2, z),
 
-    grass_vertices += create_grass(x, z, size=0.05)
-
-vertices_grass = np.zeros(len(grass_vertices), [("position", np.float32,3)])
-vertices_grass["position"] = grass_vertices
-
+        (x1, y1, z),
+        (x2, y2, z),
+        (x1, y2, z),
+    ]
 
 
 
 walls1 = [
 # face 1
-
-
-
 # face 4
 ( 0.20,-0.20,-0.00), ( 0.00,-0.20, 0.20), ( 0.00, 0.00, 0.20),
 ( 0.20,-0.20,-0.00), ( 0.00, 0.00, 0.20), ( 0.20, 0.00,-0.00),
@@ -373,6 +374,33 @@ oval_nuvem2_vertices["position"] = oval_nuvem2
 oval_nuvem3_vertices = np.zeros(len(oval_nuvem3), [("position", np.float32,3)])
 oval_nuvem3_vertices["position"] = oval_nuvem3
 
+#arvore 
+rectangle = create_rectangle(-0.1, -0.2, 0.1, 0.2, z=-0.5)
+
+vertices_rectangle = np.zeros(len(rectangle), [("position", np.float32, 3)])
+vertices_rectangle["position"] = rectangle
+
+
+circle1 = create_circle(radius=0.2, segments=50, z=0.0)
+
+vertices_circle1 = np.zeros(len(circle1), [("position", np.float32,3)])
+vertices_circle1["position"] = circle1
+
+circle2 = create_circle(radius=0.3, segments=50, z=0.0)
+
+vertices_circle2 = np.zeros(len(circle2), [("position", np.float32,3)])
+vertices_circle2["position"] = circle2
+
+circle3 = create_circle(radius=0.4, segments=50, z=0.0)
+
+vertices_circle3 = np.zeros(len(circle3), [("position", np.float32,3)])
+vertices_circle3["position"] = circle3
+
+
+circle4 = create_circle(radius=0.1, segments=50, z=0.0)
+
+vertices_maca = np.zeros(len(circle4), [("position", np.float32,3)])
+vertices_maca["position"] = circle4
 
 # ---------------------------------------
 # MATRIZES
@@ -488,8 +516,15 @@ object_nuvem3 = SceneObject(oval_nuvem3_vertices)
 
 object_laser = SceneObject(vertices_laser)
 
-for obj in [house_walls1, house_walls2, house_roof1, house_roof2, floor, ufo_base, ufo_top]:
-    obj.tx = 0
+object_folha1 = SceneObject(vertices_circle1)
+object_folha2 = SceneObject(vertices_circle2)
+object_folha3 = SceneObject(vertices_circle3)
+
+object_rectangle = SceneObject(vertices_rectangle)
+
+object_maca = SceneObject(vertices_maca)
+
+
 
 
 # ---------------------------------------
@@ -505,10 +540,6 @@ glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
 # ---------------------------------------
 
 time = 0
-
-object_nuvem1.tx = -1
-object_nuvem2.tx = -0.7
-object_nuvem3.tx = -0.4
 
 wireframe = False
 
@@ -603,6 +634,20 @@ def key_event(window, key, scancode, action, mods):
             house_roof1.scale  -= 0.01
             house_roof2.scale  -= 0.01
 
+       
+
+        if key == glfw.KEY_F:
+            object_maca.scale += 0.05
+
+        if key == glfw.KEY_G:
+            object_maca.scale -= 0.
+            
+        if key == glfw.KEY_R:
+            object_maca.ty += 0.02
+
+        if key == glfw.KEY_V:
+            object_maca.ty -= 0.02
+
 #posicionamento e escala UFO
 
 ufo_base.tz = -0.5
@@ -615,6 +660,53 @@ ufo_base.tx = -0.5
 ufo_top.tx = -0.5
 
 object_laser.tx = -0.5
+
+
+##nuvem
+
+
+
+object_nuvem1.tx = -1
+object_nuvem2.tx = -0.7
+object_nuvem3.tx = -0.4
+
+
+#arvore
+
+
+object_rectangle.tx = 0.65   
+object_rectangle.ty = 0.0  
+object_rectangle.tz = 0
+
+object_rectangle.scale = 1.0
+
+# folhas (acima do tronco)
+object_folha1.tx = 0.65
+object_folha1.ty = 0.43
+object_folha1.tz = -0.72
+object_folha1.scale = 0.7
+
+object_folha2.tx = 0.53
+object_folha2.ty = 0.25
+object_folha2.tz = -0.76
+object_folha2.scale = 0.7       
+
+object_folha3.tx = 0.75
+object_folha3.ty = 0.25
+object_folha3.tz = -0.7
+object_folha3.scale = 0.7
+
+object_maca.tx = 0.8
+object_maca.ty = 0.2
+object_maca.tz = -0.8
+object_maca.scale = 0
+##
+
+
+
+for obj in [house_walls1, house_walls2, house_roof1, house_roof2, floor]:
+    obj.tx = 0
+
 
 
 
@@ -699,14 +791,31 @@ while not glfw.window_should_close(window):
     glUniform4f(loc_color, 0.85, 0.85, 0.85, 1)  
     object_nuvem3.draw()
 
-    #LASER
+   
+
+# RETÂNGULO (marrom)
+    glUniform4f(loc_color, 0.4, 0.2, 0.1, 1)
+    object_rectangle.draw()
+
+    #folhas da arvore
+    # FOLHAS (verde)
+    glUniform4f(loc_color, 0.0, 0.6, 0.0, 1)
+    object_folha1.draw()
+
+    glUniform4f(loc_color, 0.0, 0.7, 0.0, 1)
+    object_folha2.draw()
+
+    glUniform4f(loc_color, 0.0, 0.5, 0.0, 1)
+    object_folha3.draw()
+
+    glUniform4f(loc_color, 0.812, 0.165, 0.165, 1)
+    object_maca.draw()
+
+    
+ #LASER
     glUniform4f(loc_color,0.031, 1, 0.345, 0.5)
     object_laser.scale = 3
     object_laser.draw()
-
-
-    
-
 
     glfw.swap_buffers(window)
     glfw.poll_events()
