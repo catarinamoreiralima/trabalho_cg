@@ -412,6 +412,19 @@ stem = create_rectangle(-0.01, 0.0001, 0.01, 0.1, z=0.0)
 vertices_stem = np.zeros(len(stem), [("position", np.float32, 3)])
 vertices_stem["position"] = stem
 
+
+# poste vertical (mais alto e fino)
+post_vertices = create_rectangle(-0.02, -0.2, 0.02, 0.2)
+
+vertices_post = np.zeros(len(post_vertices), [("position", np.float32, 3)])
+vertices_post["position"] = post_vertices
+
+# barra horizontal longa
+rail_vertices = create_rectangle(-1, -0.02, 1, 0.02)
+
+vertices_rail = np.zeros(len(rail_vertices), [("position", np.float32, 3)])
+vertices_rail["position"] = rail_vertices
+
 # ---------------------------------------
 # MATRIZES
 # ---------------------------------------
@@ -534,6 +547,25 @@ object_rectangle = SceneObject(vertices_rectangle)
 
 object_maca = SceneObject(vertices_maca)
 object_stem = SceneObject(vertices_stem)
+
+fence_posts = []
+num_posts = 10
+
+for i in range(num_posts):
+    post = SceneObject(vertices_post)
+
+    post.tx = -0.9 + i * 0.2   # espaçamento
+    post.ty = -0.45
+    post.tz = -0.9              # posição no fundo do cenário
+
+    fence_posts.append(post)
+
+
+# barras horizontais
+fence_rail_top = SceneObject(vertices_rail)
+fence_rail_bottom = SceneObject(vertices_rail)
+
+
 
 
 
@@ -678,6 +710,26 @@ def key_event(window, key, scancode, action, mods):
 #posicionamento e escalas iniciais dos objetos
 
 
+house_walls1.tz += 0.5
+house_walls2.tz += 0.5
+house_roof1.tz  += 0.5
+house_roof2.tz  += 0.5
+floor.tz        = 1.2
+
+house_walls1.ty -= 0.02
+house_walls2.ty -= 0.02
+house_roof1.ty  -= 0.02
+house_roof2.ty  -= 0.02
+
+fence_rail_top.tx = 0
+fence_rail_top.ty = -0.4
+fence_rail_top.tz = -0.9
+
+fence_rail_bottom.tx = 0
+fence_rail_bottom.ty = -0.5
+fence_rail_bottom.tz = -0.9
+
+
 #UFO e laser
 
 ufo_base.tz = -0.5
@@ -690,6 +742,7 @@ ufo_base.tx = -0.5
 ufo_top.tx = -0.5
 
 object_laser.tx = -0.5
+object_laser.tz = 0.5
 
 
 ##nuvem
@@ -702,24 +755,24 @@ object_nuvem3.tx = -0.4
 #arvore
 #tronco
 
-object_rectangle.tx = 0.65   
-object_rectangle.ty = 0.0  
+object_rectangle.tx = 0.6   
+object_rectangle.ty = -0.1  
 object_rectangle.tz = 0
 
 object_rectangle.scale = 1.0
 
 # folhas (acima do tronco)
-object_folha1.tx = 0.65
-object_folha1.ty = 0.43
+object_folha1.tx = 0.6
+object_folha1.ty = 0.4
 object_folha1.tz = -0.72
 object_folha1.scale = 0.7
 
-object_folha2.tx = 0.53
+object_folha2.tx = 0.5
 object_folha2.ty = 0.25
-object_folha2.tz = -0.76
+object_folha2.tz = -0.7
 object_folha2.scale = 0.7       
 
-object_folha3.tx = 0.75
+object_folha3.tx = 0.7
 object_folha3.ty = 0.25
 object_folha3.tz = -0.7
 object_folha3.scale = 0.7
@@ -852,6 +905,19 @@ while not glfw.window_should_close(window):
 
     glUniform4f(loc_color, 0.4, 0.2, 0.1, 1)
     object_stem.draw()
+
+
+    # CERCA 🪵
+
+    glUniform4f(loc_color, 0.55, 0.27, 0.07, 1)  # marrom madeira
+
+    # postes
+    for post in fence_posts:
+        post.draw()
+
+    # barras
+    fence_rail_top.draw()
+    fence_rail_bottom.draw()
 
     
  #LASER
