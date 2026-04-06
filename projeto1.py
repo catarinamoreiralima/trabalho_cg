@@ -209,20 +209,7 @@ def create_truncated_cone(r_bottom, r_top, height, segments=40):
 
     return vertices
 
-#laser de abdução
-laser = create_truncated_cone(0.1, 0.05, 0.5, segments=40)
-vertices_laser = np.zeros(len(laser), [("position", np.float32,3)])
-vertices_laser["position"] = laser
 
-#ufo
-oval = create_flat_sphere(0.5, 0.15, 0.5)
-dome = create_dome(0.2, 0.1, segments=40, rings=10)
-
-vertices_oval = np.zeros(len(oval), [("position", np.float32,3)])
-vertices_oval["position"] = oval
-
-vertices_top = np.zeros(len(dome), [("position", np.float32,3)])
-vertices_top["position"] = dome
 
 
 
@@ -237,6 +224,8 @@ def create_rectangle(x1, y1, x2, y2, z=0.0):
         (x1, y2, z),
     ]
 
+
+##VERTICES
 
 
 walls1 = [
@@ -359,6 +348,22 @@ vertices_roof2["position"] = roof2
 
 vertices_floor = np.zeros(len(floor), [("position", np.float32,3)])
 vertices_floor["position"] = floor
+
+
+#laser de abdução
+laser = create_truncated_cone(0.1, 0.05, 0.5, segments=40)
+vertices_laser = np.zeros(len(laser), [("position", np.float32,3)])
+vertices_laser["position"] = laser
+
+#ufo
+oval = create_flat_sphere(0.5, 0.15, 0.5)
+dome = create_dome(0.2, 0.1, segments=40, rings=10)
+
+vertices_oval = np.zeros(len(oval), [("position", np.float32,3)])
+vertices_oval["position"] = oval
+
+vertices_top = np.zeros(len(dome), [("position", np.float32,3)])
+vertices_top["position"] = dome
 
 # nuvem
 oval_nuvem1 = create_flat_sphere(0.8, 0.8, 0.8)
@@ -668,7 +673,12 @@ def key_event(window, key, scancode, action, mods):
             object_maca.ty -= 0.02
             object_stem.ty -= 0.02
 
-#posicionamento e escala UFO
+
+
+#posicionamento e escalas iniciais dos objetos
+
+
+#UFO e laser
 
 ufo_base.tz = -0.5
 ufo_base.scale = 0.8
@@ -684,15 +694,13 @@ object_laser.tx = -0.5
 
 ##nuvem
 
-
-
 object_nuvem1.tx = -1
 object_nuvem2.tx = -0.7
 object_nuvem3.tx = -0.4
 
 
 #arvore
-
+#tronco
 
 object_rectangle.tx = 0.65   
 object_rectangle.ty = 0.0  
@@ -716,6 +724,8 @@ object_folha3.ty = 0.25
 object_folha3.tz = -0.7
 object_folha3.scale = 0.7
 
+
+##maca
 object_maca.tx = 0.8
 object_maca.ty = 0.2
 object_maca.tz = -0.8
@@ -732,6 +742,7 @@ object_stem.scale = 0.3
 for obj in [house_walls1, house_walls2, house_roof1, house_roof2, floor]:
     obj.tx = 0
 
+## laser começa invisivel
 
 laser_alpha = 0.0
 
@@ -832,6 +843,9 @@ while not glfw.window_should_close(window):
 
     glUniform4f(loc_color, 0.0, 0.5, 0.0, 1)
     object_folha3.draw()
+
+
+    ##MACA
 
     glUniform4f(loc_color, 0.812, 0.165, 0.165, 1)
     object_maca.draw()
